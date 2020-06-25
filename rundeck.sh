@@ -7,6 +7,7 @@ xml_value=$(xmlstarlet sel -t -m "//job" -v "name" -o " " -v "@id" -n rundeck.xm
 echo "$xml_value"
 echo $xml_value > xml.txt
 #Find exact job id of the job name
+awk -v "key=$job_name" -F" " 'BEGIN {IGNORECASE = 1} {if($1 == key) print($2)}' xml.txt
 job_id=$(awk -v "key=$job_name" -F" " 'BEGIN {IGNORECASE = 1} {if($1 == key) print($2)}' xml.txt)
 echo "$job_id"
 #Execute jobs using job id with parameters
