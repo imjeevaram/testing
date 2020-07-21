@@ -1,5 +1,13 @@
 #!/bin/bash
 #To get list of jobs with TARGET project using curl
+# $1 --> SERVER_IP
+# $2 --> API_TOKEN
+# $3 --> PROJECT_NAME
+# $4 --> RUNDECK_JOB_NAME
+# $5 --> JOB_OPTION1
+# $6 --> JOB_OPTION2
+# $7 --> JOB_OPTION1_VALUE
+# $8 --> JOB_OPTION2_VALUE
 #Input passing
 SLEEP_TIME=10
 URL_JOB_ID="http://$1/api/14/project/$3/jobs"
