@@ -56,7 +56,7 @@ do
 		  
 	   fi		   
 done
-echo -e "\n*********Job Completed***********"
+echo -e "\n********* Rundeck Job Completed ***********"
 
 for value in $(echo $7 | tr "," "\n")
 do
