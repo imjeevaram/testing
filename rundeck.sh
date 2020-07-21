@@ -60,5 +60,6 @@ echo -e "\n*********Job Completed***********"
 
 for value in $(echo $7 | tr "," "\n")
 do
-	curl  -s -H "X-Rundeck-Auth-Token:$2"  $URL_JOB_STATUS/"${!value}"  | xmlstarlet sel -t -o 'BUILD_ID:'  -c "string(/result/executions/execution/@id)"   -o '  BUILD_STATUS:' -c "string(/result/executions/execution/@status)"  | sed 's/%//'
+	curl  -s -H "X-Rundeck-Auth-Token:$2"  $URL_JOB_STATUS/"${!value}"  | xmlstarlet sel -t -o ' BUILD_ID:'  -c "string(/result/executions/execution/@id)"   -o '  BUILD_STATUS:' -c "string(/result/executions/execution/@status)"  | sed 's/%//'
+echo -e"\n"
 done
