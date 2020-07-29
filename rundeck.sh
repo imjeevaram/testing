@@ -63,7 +63,7 @@ do
 							 ((count+=1));					  	
 				else
 					sleep $SLEEP_TIME;
-					echo -e "\nHi,\n***Build status of rundeck job***\n\nProject_Name: $3 \nJob_Name: $4\n\n"  >> $OUTPUT_FILE
+					echo -e "\n***Build status of rundeck job***\n\nProject_Name: $3 \nJob_Name: $4\n\n"  >> $OUTPUT_FILE
 					for id in "${build_id[@]}"
 					do
 						curl  -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_STATUS/$id  | xmlstarlet sel -t   -o 'REGION:-' -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:-'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:-' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >> $OUTPUT_FILE
@@ -71,7 +71,7 @@ do
 					done
 					#Rundeck Job checking 
 					echo -e "\nRundeck PROJECT_NAME:$3 \n JOB_URL:$JOB_URL \n REGION:$value  \n Rundeck Job is running more than threshold.So please check rundeck server*******" >> $OUTPUT_FILE
-					echo -e "\n\n\nRegards,\nDevops Team" >> $OUTPUT_FILE
+					echo -e "\n\nRegards,\nDevops Team" >> $OUTPUT_FILE
 					cat  $OUTPUT_FILE
 					exit 
 			       fi		
@@ -79,12 +79,12 @@ do
 done
 echo -e "\n*********Job has been executed with all regions***********"
 sleep $SLEEP_TIME;
-echo -e "\nHi,\n***Build status of rundeck job***\n\nProject_Name: $3 \nJob_Name: $4\n\n"  >> $OUTPUT_FILE
+echo -e "\n***Build status of rundeck job***\n\nProject_Name: $3 \nJob_Name: $4\n\n"  >> $OUTPUT_FILE
 for id in "${build_id[@]}"
 do
 	curl   -s -k  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"    $URL_JOB_STATUS/$id  | xmlstarlet sel -t  -o "REGION:-" -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:-'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:-' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >>  $OUTPUT_FILE
         echo -e "\n" >> $OUTPUT_FILE
 done
-echo -e "\n\n\nRegards,\nDevops Team" >> $OUTPUT_FILE
+echo -e "\n\nRegards,\nDevops Team" >> $OUTPUT_FILE
 cat $OUTPUT_FILE
 fi
