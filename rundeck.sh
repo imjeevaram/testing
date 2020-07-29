@@ -12,6 +12,7 @@
 SLEEP_TIME=15
 URL_TIME_OUT=30
 OUTPUT_FILE=output.txt
+rm -rvf $OUTPUT_FILE
 URL_JOB_ID="https://$1/api/14/project/$3/jobs"
 URL_JOB_CHECK="https://$1/api/14/project/$3/executions/running"
 URL_JOB_STATUS="https://$1/api/1/execution"
