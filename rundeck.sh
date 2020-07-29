@@ -42,7 +42,7 @@ do
    		#  echo  -e "************ Job $CURRENT_JOB_ID is not running
  	   	 #Tiggered rundeck api with arguments using curl method		
 		  curl  -s -k -H "X-Rundeck-Auth-Token:$2"   -X POST   $URL_RUN  -d argString=-$5+$value%20-$6+$8
-               build_id[$count]=$(curl -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"    $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/@id)" | sed 's/%//')
+               build_id[$count]=$(curl s -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"    $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/@id)" | sed 's/%//')
 			   ((count+=1));	
 	   else
 		#display date & time for  waiting period
@@ -59,14 +59,14 @@ do
 	    	   		then
 			    	   	 #Tiggered rundeck api with arguments using curl method		
 			   		  curl  -s -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   -X POST    $URL_RUN  -d argString=-$5+$value%20-$6+$8
-			                 build_id[$count]=$(curl  -k -m $URL_TIME_OUT  -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/@id)" | sed 's/%//')	 
+			                 build_id[$count]=$(curl -s -k -m $URL_TIME_OUT  -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/@id)" | sed 's/%//')	 
 							 ((count+=1));					  	
 				else
 					sleep $SLEEP_TIME;
 					echo -e "\n***Build status of rundeck job***\nProject_Name: $3 \nJob_Name: $4\n"  >> $OUTPUT_FILE
 					for id in "${build_id[@]}"
 					do
-						curl    -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_STATUS/$id  | xmlstarlet sel -t   -o 'REGION:-' -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:-'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:-' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >> $OUTPUT_FILE
+						curl  -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_STATUS/$id  | xmlstarlet sel -t   -o 'REGION:-' -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:-'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:-' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >> $OUTPUT_FILE
 					done
 					#Rundeck Job checking 
 					echo -e "\nRundeck PROJECT_NAME:$3 \n JOB_URL:$JOB_URL \n REGION:$value  \n Rundeck Job is running more than threshold.So please check rundeck server*******" >> $OUTPUT_FILE
