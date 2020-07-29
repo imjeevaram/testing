@@ -9,9 +9,8 @@
 # $7 --> JOB_OPTION1_VALUE
 # $8 --> JOB_OPTION2_VALUE
 #Input passing
-SLEEP_TIME=10
-STATUS_SLEEP_TIME=10
-URL_TIME_OUT=10
+SLEEP_TIME=15
+URL_TIME_OUT=30
 OUTPUT_FILE=output.txt
 URL_JOB_ID="https://$1/api/14/project/$3/jobs"
 URL_JOB_CHECK="https://$1/api/14/project/$3/executions/running"
@@ -20,7 +19,7 @@ URL_JOB_STATUS="https://$1/api/1/execution"
 echo  -e "\n************Rundeck Project Name : $3"
 echo  -e "************Rundeck Job Name : $4"
 #To get job name of job id in rundeck
-JOB_ID=$(curl -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"  -k $URL_JOB_ID  | xmlstarlet sel -t -c "string(/jobs/job[name='$4']/@id)"  | sed 's/%//' )
+JOB_ID=$(curl -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_ID  | xmlstarlet sel -t -c "string(/jobs/job[name='$4']/@id)"  | sed 's/%//' )
 URL_RUN="https://$1/api/1/job/$JOB_ID/run"
 JOB_URL="https://$1/project/$3/job/show/$JOB_ID"
 
@@ -34,7 +33,7 @@ else
 for value in $(echo $5_VALUE | tr "," "\n")
 do
 	   echo -e "\n************Argument Input: $value *************"
-          CURRENT_JOB_ID=$(curl  -s  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"  -k  $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/job[name='$4']/@id)" | sed 's/%//')
+          CURRENT_JOB_ID=$(curl  -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/job[name='$4']/@id)" | sed 's/%//')
          	  
 	  #Checking same job id is running in rundeck or not	
 	   if [ -z  "$CURRENT_JOB_ID" ]  
@@ -42,7 +41,8 @@ do
    		#  echo  -e "************ Job $CURRENT_JOB_ID is not running
  	   	 #Tiggered rundeck api with arguments using curl method		
 		  curl  -s -H "X-Rundeck-Auth-Token:$2"   -X POST   $URL_RUN  -d argString=-$5+$value%20-$6+$8
-               build_id[$count]=$(curl -s  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"  -k  $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/@id)" | sed 's/%//')
+		  sleep 5;
+               build_id[$count]=$(curl -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"    $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/@id)" | sed 's/%//')
 			   ((count+=1));	
 	   else
 		#display date & time for  waiting period
@@ -52,21 +52,21 @@ do
 		#waiting period for perious job execution status
 	   	sleep $SLEEP_TIME;
 	  #getting job status of perious rundeck job id	   
- 	   CURRENT_JOB_ID=$(curl -s  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"  -k $URL_JOB_CHECK | xmlstarlet sel -t -c "string(/executions/execution/job[name='$4']/@id)" | sed 's/%//')
+ 	   CURRENT_JOB_ID=$(curl -s -k  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK | xmlstarlet sel -t -c "string(/executions/execution/job[name='$4']/@id)" | sed 's/%//')
 		     #Repeat check for current job status     
 			
 	    	   		if [ -z $CURRENT_JOB_ID  ]
 	    	   		then
 			    	   	 #Tiggered rundeck api with arguments using curl method		
-			   		  curl  -s -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   -X POST  -k  $URL_RUN  -d argString=-$5+$value%20-$6+$8
-			                 build_id[$count]=$(curl -s -m $URL_TIME_OUT  -H "X-Rundeck-Auth-Token:$2"  -k  $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/@id)" | sed 's/%//')	 
+			   		  curl  -s -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   -X POST    $URL_RUN  -d argString=-$5+$value%20-$6+$8
+			                 build_id[$count]=$(curl -s -k -m $URL_TIME_OUT  -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/@id)" | sed 's/%//')	 
 							 ((count+=1));					  	
 				else
-					sleep $STATUS_SLEEP_TIME;
+					sleep $SLEEP_TIME;
 					echo -e "\n"
 					for id in "${build_id[@]}"
 					do
-						curl  -s -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"  -k $URL_JOB_STATUS/$id  | xmlstarlet sel -t   -o 'REGION:' -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >> $OUTPUT_FILE
+						curl  -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_STATUS/$id  | xmlstarlet sel -t   -o 'REGION:' -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >> $OUTPUT_FILE
 					done
 					#Rundeck Job checking 
 					echo -e "\nRundeck PROJECT_NAME:$3 \n JOB_URL:$JOB_URL \n REGION:$value  \n Rundeck Job is running more than threshold.So please check rundeck server*******" >> $OUTPUT_FILE
@@ -76,12 +76,12 @@ do
 	   fi		   
 done
 echo -e "\n*********Job has been executed with all regions***********"
-sleep $STATUS_SLEEP_TIME;
+sleep $SLEEP_TIME;
 echo -e "\n"
 for id in "${build_id[@]}"
 do
 	
-	curl  -s -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"  -k  $URL_JOB_STATUS/$id  | xmlstarlet sel -t  -o "REGION:" -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >>  $OUTPUT_FILE
+	curl  -s -k  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"    $URL_JOB_STATUS/$id  | xmlstarlet sel -t  -o "REGION:" -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >>  $OUTPUT_FILE
 done
 cat $OUTPUT_FILE
 fi
