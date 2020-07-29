@@ -31,7 +31,7 @@ else
 	echo  -e "************Rundeck Job ID : $JOB_ID"
 	count=0
 #passing multiple arg to cmd using for loop
-for value in $(echo $5 | tr "," "\n")
+for value in $(echo $7 | tr "," "\n")
 do
 	   echo -e "\n************Argument Input: $value *************"
           CURRENT_JOB_ID=$(curl  -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/job[name='$4']/@id)" | sed 's/%//')
