@@ -41,7 +41,7 @@ do
 	   then
    		#  echo  -e "************ Job $CURRENT_JOB_ID is not running
  	   	 #Tiggered rundeck api with arguments using curl method		
-		  curl  -s -H "X-Rundeck-Auth-Token:$2"   -X POST   $URL_RUN  -d argString=-$5+$value%20-$6+$8
+		  curl  -s -k -H "X-Rundeck-Auth-Token:$2"   -X POST   $URL_RUN  -d argString=-$5+$value%20-$6+$8
 		  sleep 5;
                build_id[$count]=$(curl -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"    $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/@id)" | sed 's/%//')
 			   ((count+=1));	
