@@ -9,7 +9,7 @@
 # $7 --> JOB_OPTION1_VALUE
 # $8 --> JOB_OPTION2_VALUE
 #Input passing
-SLEEP_TIME=15
+SLEEP_TIME=30
 URL_TIME_OUT=30
 OUTPUT_FILE=output.txt
 rm -rvf $OUTPUT_FILE
@@ -31,7 +31,7 @@ else
 	echo  -e "************Rundeck Job ID : $JOB_ID"
 	count=0
 #passing multiple arg to cmd using for loop
-for value in $(echo $7 | tr "," "\n")
+for value in $(echo $5 | tr "," "\n")
 do
 	   echo -e "\n************Argument Input: $value *************"
           CURRENT_JOB_ID=$(curl  -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/job[name='$4']/@id)" | sed 's/%//')
@@ -64,10 +64,10 @@ do
 							 ((count+=1));					  	
 				else
 					sleep $SLEEP_TIME;
-					echo -e "\n"
+					echo -e "\n***Build status of rundeck job***\nProject_Name: $3 \nJob_Name: $4\n"  >> $OUTPUT_FILE
 					for id in "${build_id[@]}"
 					do
-						curl  -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_STATUS/$id  | xmlstarlet sel -t   -o 'REGION:' -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >> $OUTPUT_FILE
+						curl  -s  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_STATUS/$id  | xmlstarlet sel -t   -o 'REGION:-' -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:-'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:-' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >> $OUTPUT_FILE
 					done
 					#Rundeck Job checking 
 					echo -e "\nRundeck PROJECT_NAME:$3 \n JOB_URL:$JOB_URL \n REGION:$value  \n Rundeck Job is running more than threshold.So please check rundeck server*******" >> $OUTPUT_FILE
@@ -78,11 +78,11 @@ do
 done
 echo -e "\n*********Job has been executed with all regions***********"
 sleep $SLEEP_TIME;
-echo -e "\n"
+echo -e "\n***Build status of rundeck job***\nProject_Name: $3 \nJob_Name: $4\n"  >> $OUTPUT_FILE
 for id in "${build_id[@]}"
 do
 	
-	curl  -s -k  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"    $URL_JOB_STATUS/$id  | xmlstarlet sel -t  -o "REGION:" -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >>  $OUTPUT_FILE
+	curl  -s -k  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"    $URL_JOB_STATUS/$id  | xmlstarlet sel -t  -o "REGION:-" -c "string(/result/executions/execution/job/options/option[1]/@value)"  -o '   BUILD_ID:-'  -c "string(/result/executions/execution/@href)"   -o '    BUILD_STATUS:-' -c "string(/result/executions/execution/@status)"  | sed 's/%//'  >>  $OUTPUT_FILE
 done
 cat $OUTPUT_FILE
 fi
