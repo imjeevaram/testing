@@ -51,7 +51,7 @@ do
 					do
 						IMPORT_JOB_STATUS=$(curl  -s -S -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"  $URL_JOB_STATUS/$id  | xmlstarlet sel -t   -c "string(/result/executions/execution/@status)"    | sed 's/%//'  )
 					done
-					echo -e "Import Job Build Status:- $import_status"
+					echo -e "Import Job Build Status:- $IMPORT_JOB_STATUS"
 					#Rundeck Job checking 
 					echo -e "\n\nRundeck import deployment job service( $value ) is running more than threshold.So,please check import job configuration in Rundeck server\nJob url link as, $JOB_URL  \n" 
 					exit 
@@ -65,4 +65,4 @@ do
 	IMPORT_JOB_STATUS=$(curl  -s -S -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"  $URL_JOB_STATUS/$id  | xmlstarlet sel -t    -c "string(/result/executions/execution/@status)"    | sed 's/%//'  )
 done
 fi
-echo -e "Import Job Build Status:- $import_status"
+echo -e "Import Job Build Status:- $IMPORT_JOB_STATUS"
