@@ -20,7 +20,7 @@ URL_JOB_STATUS="https://$1/api/1/execution"
 echo  -e "\n************Rundeck Project Name : $3"
 echo  -e "************Rundeck Job Name : $4"
 #To get job name of job id in rundeck
-JOB_ID=$(curl -s -S -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_ID  | xmlstarlet sel -t -c "string(/jobs/job[name='$4']/@id)"  | sed 's/%//' )
+JOB_ID=$(curl -s -S -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_ID  | xmlstarlet sel -t -c "string(/jobs/job[name='apply $4']/@id)"  | sed 's/%//' )
 URL_RUN="https://$1/api/1/job/$JOB_ID/run"
 JOB_URL="https://$1/project/$3/job/show/$JOB_ID"
 
@@ -34,7 +34,7 @@ else
 for value in $(echo $7 | tr "," "\n")
 do
 	   echo -e "\n************Argument Input: $value *************"
-          CURRENT_JOB_ID=$(curl  -s -S  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/job[name='$4']/@id)" | sed 's/%//')
+          CURRENT_JOB_ID=$(curl  -s -S  -k -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK  | xmlstarlet sel -t -c "string(/executions/execution/job[name='apply $4']/@id)" | sed 's/%//')
          	  
 	  #Checking same job id is running in rundeck or not	
 	   if [ -z  "$CURRENT_JOB_ID" ]  
@@ -52,7 +52,7 @@ do
 		#waiting period for perious job execution status
 	   	sleep $SLEEP_TIME;
 	  #getting job status of perious rundeck job id	   
- 	   CURRENT_JOB_ID=$(curl -s -S -k  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK | xmlstarlet sel -t -c "string(/executions/execution/job[name='$4']/@id)" | sed 's/%//')
+ 	   CURRENT_JOB_ID=$(curl -s -S -k  -m $URL_TIME_OUT -H "X-Rundeck-Auth-Token:$2"   $URL_JOB_CHECK | xmlstarlet sel -t -c "string(/executions/execution/job[name='apply $4']/@id)" | sed 's/%//')
 		     #Repeat check for current job status     
 			
 	    	   		if [ -z $CURRENT_JOB_ID  ]
