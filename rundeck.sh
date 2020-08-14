@@ -9,9 +9,9 @@
 # $7 --> JOB_OPTION1_VALUE
 # $8 --> JOB_OPTION2_VALUE
 #Input passing
-SLEEP_TIME=60
+SLEEP_TIME=30
 URL_TIME_OUT=30
-OUTPUT_FILE=output.txt
+OUTPUT_FILE=rundeck_output.txt
 rm -rvf $OUTPUT_FILE
 URL_JOB_ID="https://$1/api/14/project/$3/jobs"
 URL_JOB_CHECK="https://$1/api/14/project/$3/executions/running"
